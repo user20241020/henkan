@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スーパー変換マルチツール</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #1a73e8;
+            margin-top: 0;
+        }
+        /* タブのスタイリング */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            text-align: center;
+        }
+        .tab-btn.active {
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+            margin-bottom: -2px;
+        }
+        /* コンテンツの表示・非表示 */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* 入力フォームのスタイリング */
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #1557b0;
+        }
+        /* 結果表示 */
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f0fe;
+            border-radius: 6px;
+            border-left: 5px solid #1a73e8;
+            font-weight: bold;
+            font-size: 16px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>直感変換マルチツール</h1>
+    
+    <!-- タブ切り替えボタン -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('data-tab')">データ量</button>
+        <button class="tab-btn" onclick="openTab('fuel-tab')">車の燃費</button>
+        <button class="tab-btn" onclick="openTab('length-tab')">長さ・工作</button>
+    </div>
+
+    <!-- 1. データ量変換 -->
+    <div id="data-tab" class="tab-content active">
+        <div class="input-group">
+            <label>変換元の数値:</label>
+            <input type="number" id="dataInput" placeholder="数値を入力" value="1">
+        </div>
+        <div class="input-group">
+            <label>元の単位:</label>
+            <select id="dataUnit">
+                <option value="KB">KB (キロバイト)</option>
+                <option value="MB" selected>MB (メガバイト)</option>
+                <option value="GB">GB (ギガバイト)</option>
+            </select>
+        </div>
+        <button onclick="convertData()">変換する！</button>
+        <div class="result-box" id="dataResult">ここに結果が出ます</div>
+    </div>
+
+    <!-- 2. 燃費計算 -->
+    <div id="fuel-tab" class="tab-content">
+        <div class="input-group">
+            <label>走った距離 (km):</label>
+            <input type="number" id="distanceInput" placeholder="例: 300">
+        </div>
+        <div class="input-group">
+            <label>使ったガソリン (L):</label>
+            <input type="number" id="fuelInput" placeholder="例: 20">
+        </div>
+        <button onclick="calculateFuel()">燃費を計算する！</button>
+        <div class="result-box" id="fuelResult">ここに結果が出ます</div>
+    </div>
+
+    <!-- 3. 長さ変換 -->
+    <div id="length-tab" class="tab-content">
+        <div class="input-group">
+            <label>長さを入力:</label>
+            <input type="number" id="lengthInput" placeholder="数値を入力" value="1">
+        </div>
+        <div class="input-group">
+            <label>元の単位:</label>
+            <select id="lengthUnit">
+                <option value="mm">mm (ミリメートル)</option>
+                <option value="cm" selected>cm (センチメートル)</option>
+                <option value="inch">inch (インチ)</option>
+            </select>
+        </div>
+        <button onclick="convertLength()">変換する！</button>
+        <div class="result-box" id="lengthResult">ここに結果が出ます</div>
+    </div>
+</div>
+
+<script>
+    // タブを切り替える関数
+    function openTab(tabId) {
+        // すべてのコンテンツを非表示にする
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+        
+        // すべてのタブボタンの選択状態を解除する
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        
+        // クリックされたタブとコンテンツをアクティブにする
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // 1. データ量変換の計算
+    function convertData() {
+        const val = parseFloat(document.getElementById('dataInput').value);
+        const unit = document.getElementById('dataUnit').value;
+        const resultDiv = document.getElementById('dataResult');
+        
+        if (isNaN(val)) {
+            resultDiv.innerText = "正しい数値を入力してください";
+            return;
+        }
+
+        let kb, mb, gb;
+        if (unit === "KB") {
+            kb = val;
+            mb = val / 1024;
+            gb = val / (1024 * 1024);
+        } else if (unit === "MB") {
+            kb = val * 1024;
+            mb = val;
+            gb = val / 1024;
+        } else {
+            kb = val * 1024 * 1024;
+            mb = val * 1024;
+            gb = val;
+        }
+
+        resultDiv.innerHTML = `
+            ・${kb.toLocaleString(undefined, {maximumFractionDigits: 4})} KB<br>
+            ・${mb.toLocaleString(undefined, {maximumFractionDigits: 4})} MB<br>
+            ・${gb.toLocaleString(undefined, {maximumFractionDigits: 4})} GB
+        `;
+    }
+
+    // 2. 燃費の計算
+    function calculateFuel() {
+        const distance = parseFloat(document.getElementById('distanceInput').value);
+        const fuel = parseFloat(document.getElementById('fuelInput').value);
+        const resultDiv = document.getElementById('fuelResult');
+
+        if (isNaN(distance) || isNaN(fuel) || fuel <= 0) {
+            resultDiv.innerText = "正しい距離とガソリン量を入力してください";
+            return;
+        }
+
+        const efficiency = distance / fuel;
+        resultDiv.innerText = `燃費は： ${efficiency.toFixed(2)} km/L です！`;
+    }
+
+    // 3. 長さの変換
+    function convertLength() {
+        const val = parseFloat(document.getElementById('lengthInput').value);
+        const unit = document.getElementById('lengthUnit').value;
+        const resultDiv = document.getElementById('lengthResult');
+
+        if (isNaN(val)) {
+            resultDiv.innerText = "正しい数値を入力してください";
+            return;
+        }
+
+        let mm, cm, inch;
+        if (unit === "mm") {
+            mm = val;
+            cm = val / 10;
+            inch = val / 25.4;
+        } else if (unit === "cm") {
+            mm = val * 10;
+            cm = val;
+            inch = val / 2.54;
+        } else {
+            mm = val * 25.4;
+            cm = val * 2.54;
+            inch = val;
+        }
+
+        resultDiv.innerHTML = `
+            ・${mm.toFixed(2)} mm<br>
+            ・${cm.toFixed(2)} cm<br>
+            ・${inch.toFixed(2)} インチ
+        `;
+    }
+</script>
+
+</body>
+</html>
